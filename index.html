@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V-Rise</title>
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#06110d;
+  color:white;
+}
+#splash{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  background:linear-gradient(135deg,#020403,#053322);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+.logo{
+  width:95px;
+  height:95px;
+  border-radius:28px;
+  background:linear-gradient(135deg,#00ff99,#007a4d);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:45px;
+  font-weight:900;
+  color:#001b10;
+  box-shadow:0 0 45px rgba(0,255,153,.45);
+}
+.loader{
+  width:180px;
+  height:8px;
+  background:#13372c;
+  border-radius:30px;
+  overflow:hidden;
+  margin-top:22px;
+}
+.loader span{
+  display:block;
+  height:100%;
+  width:45%;
+  background:#00ff99;
+  border-radius:30px;
+  animation:load 1.2s infinite;
+}
+@keyframes load{
+  0%{margin-left:-50%}
+  100%{margin-left:110%}
+}
+.app{
+  max-width:540px;
+  margin:auto;
+  padding:18px 16px 95px;
+}
+.hero{
+  padding:22px 0 10px;
+}
+.hero h1{
+  font-size:42px;
+  margin:0;
+}
+.hero p{
+  margin:8px 0 0;
+  color:#bde8d8;
+}
+.card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:24px;
+  padding:18px;
+  margin:15px 0;
+  box-shadow:0 14px 35px rgba(0,0,0,.35);
+}
+h2{
+  margin:0 0 12px;
+  font-size:22px;
+}
+label,.small{
+  color:#c0e7d7;
+  font-size:14px;
+}
+input,select,button{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:0;
+  font-size:16px;
+  margin:7px 0;
+}
+input,select{
+  background:#0c1d17;
+  color:white;
+  border:1px solid #285946;
+}
+button{
+  background:linear-gradient(135deg,#00ff99,#00aa66);
+  color:#001b10;
+  font-weight:800;
+}
+button:active{
+  transform:scale(.98);
+}
+.row{
+  display:flex;
+  gap:10px;
+}
+.row button{
+  flex:1;
+}
+.task{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#0b1914;
+  border:1px solid #1b4335;
+  padding:12px;
+  border-radius:16px;
+  margin:9px 0;
+}
+.task span{
+  flex:1;
+}
+.task.done span{
+  opacity:.55;
+  text-decoration:line-through;
+}
+.del{
+  width:60px;
+  padding:9px;
+  background:#263c35;
+  color:white;
+}
+.progress{
+  height:15px;
+  background:#10291f;
+  border-radius:30px;
+  overflow:hidden;
+  margin:14px 0 7px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:#00ff99;
+  transition:.35s;
+}
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+.stat{
+  background:#0b1914;
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+}
+.stat b{
+  font-size:20px;
+}
+.timer{
+  font-size:42px;
+  font-weight:900;
+  text-align:center;
+  margin:10px 0;
+}
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#03100b;
+  border-top:1px solid #1b4335;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 8px;
+}
+.bottom button{
+  width:auto;
+  padding:10px 13px;
+  font-size:13px;
+  border-radius:14px;
+}
+.badge{
+  display:inline-block;
+  background:#0d2b20;
+  color:#00ff99;
+  border:1px solid #1f6d53;
+  border-radius:30px;
+  padding:7px 12px;
+  font-size:13px;
+  margin-top:8px;
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo">V</div>
+  <h1>V-Rise</h1>
+  <p>Routine • Goals • Alarm</p>
+  <div class="loader"><span></span></div>
+</div>
+
+<div class="app">
+  <div class="hero">
+    <h1>V-Rise</h1>
+    <p>Your daily command center</p>
+    <span class="badge">Rise mode on</span>
+  </div>
+
+  <div class="card">
+    <h2>Setup</h2>
+    <label>Name</label>
+    <input id="name" placeholder="Example: Anuj">
+    <label>Main daily goal</label>
+    <input id="mainGoal" placeholder="Example: Shop profit + skill">
+    <label>Wake-up / reminder time</label>
+    <input id="alarmTime" type="time">
+    <button onclick="saveSetup()">Start V-Rise</button>
+  </div>
+
+  <div class="card">
+    <h2 id="welcome">Welcome</h2>
+    <p id="goalText" class="small">Your main goal will appear here.</p>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <p id="percent" class="small">0% completed</p>
+
+    <div class="stats">
+      <div class="stat"><b id="totalBox">0</b><br><span class="small">Goals</span></div>
+      <div class="stat"><b id="doneBox">0</b><br><span class="small">Done</span></div>
+      <div class="stat"><b id="streakBox">0</b><br><span class="small">Streak</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Daily Goals</h2>
+    <input id="taskInput" placeholder="Add goal: 1 hour skill learning">
+    <button onclick="addTask()">Add Goal</button>
+    <div id="tasks"></div>
+  </div>
+
+  <div class="card">
+    <h2>Quick Routine</h2>
+    <div class="row">
+      <button onclick="quickAdd('Morning walk')">Walk</button>
+      <button onclick="quickAdd('Shop work')">Shop</button>
+    </div>
+    <div class="row">
+      <button onclick="quickAdd('English practice')">English</button>
+      <button onclick="quickAdd('Night planning')">Planning</button>
+    </div>
+    <div class="row">
+      <button onclick="quickAdd('No useless scrolling')">No Scroll</button>
+      <button onclick="quickAdd('Family respect action')">Family</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Focus Timer</h2>
+    <div class="timer" id="timer">25:00</div>
+    <div class="row">
+      <button onclick="startTimer()">Start</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Alarm / Reminder</h2>
+    <p class="small">Notification permission allow karna. Browser open rahe to reminder chalega.</p>
+    <button onclick="askNotify()">Allow Notification</button>
+    <button onclick="testAlarm()">Test Alarm</button>
+  </div>
+
+  <div class="card">
+    <h2>Backup</h2>
+    <button onclick="exportData()">Export My Data</button>
+    <button onclick="clearAll()">Clear All Data</button>
+  </div>
+</div>
+
+<div class="bottom">
+  <button onclick="scrollToTop()">Home</button>
+  <button onclick="focusGoal()">Goal</button>
+  <button onclick="testAlarm()">Alarm</button>
+  <button onclick="resetDay()">Reset</button>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("vriseData")) || {
+  name:"",
+  goal:"",
+  alarm:"",
+  tasks:[],
+  streak:0,
+  lastDoneDate:""
+};
+
+let timerSeconds = 25 * 60;
+let timerRunning = false;
+let timerInterval = null;
+
+function save(){
+  localStorage.setItem("vriseData", JSON.stringify(data));
+  render();
+}
+
+function saveSetup(){
+  data.name = document.getElementById("name").value.trim() || "Champion";
+  data.goal = document.getElementById("mainGoal").value.trim() || "Rise stronger today";
+  data.alarm = document.getElementById("alarmTime").value;
+  save();
+  alert("V-Rise setup saved!");
+}
+
+function addTask(){
+  let input = document.getElementById("taskInput");
+  let text = input.value.trim();
+  if(!text){
+    alert("Goal likho pehle.");
+    return;
+  }
+  data.tasks.push({text:text, done:false});
+  input.value = "";
+  save();
+}
+
+function quickAdd(text){
+  data.tasks.push({text:text, done:false});
+  save();
+}
+
+function toggleTask(index){
+  data.tasks[index].done = !data.tasks[index].done;
+  updateStreak();
+  save();
+}
+
+function deleteTask(index){
+  data.tasks.splice(index,1);
+  save();
+}
+
+function resetDay(){
+  data.tasks = data.tasks.map(t => ({text:t.text, done:false}));
+  save();
+  alert("Daily goals reset ho gaye.");
+}
+
+function updateStreak(){
+  let total = data.tasks.length;
+  let done = data.tasks.filter(t => t.done).length;
+  let today = new Date().toDateString();
+
+  if(total > 0 && done === total && data.lastDoneDate !== today){
+    data.streak += 1;
+    data.lastDoneDate = today;
+    notify("V-Rise Streak", "All goals complete. Streak increased!");
+  }
+}
+
+function render(){
+  document.getElementById("name").value = data.name;
+  document.getElementById("mainGoal").value = data.goal;
+  document.getElementById("alarmTime").value = data.alarm;
+
+  document.getElementById("welcome").innerText = "Welcome, " + (data.name || "Champion");
+  document.getElementById("goalText").innerText = data.goal || "Your main goal will appear here.";
+
+  let tasksDiv = document.getElementById("tasks");
+  tasksDiv.innerHTML = "";
+
+  data.tasks.forEach((task,index)=>{
+    let div = document.createElement("div");
+    div.className = "task" + (task.done ? " done" : "");
+    div.innerHTML = `
+      <span onclick="toggleTask(${index})">${task.done ? "✅" : "⬜"} ${task.text}</span>
+      <button class="del" onclick="deleteTask(${index})">Del</button>
+    `;
+    tasksDiv.appendChild(div);
+  });
+
+  let total = data.tasks.length;
+  let done = data.tasks.filter(t => t.done).length;
+  let percent = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById("bar").style.width = percent + "%";
+  document.getElementById("percent").innerText = percent + "% completed";
+  document.getElementById("totalBox").innerText = total;
+  document.getElementById("doneBox").innerText = done;
+  document.getElementById("streakBox").innerText = data.streak;
+}
+
+function askNotify(){
+  if("Notification" in window){
+    Notification.requestPermission().then(()=>{
+      alert("Notification permission checked.");
+    });
+  }else{
+    alert("Notification supported nahi hai.");
+  }
+}
+
+function notify(title,body){
+  try{
+    if("Notification" in window && Notification.permission === "granted"){
+      new Notification(title,{body:body});
+    }
+  }catch(e){}
+}
+
+function alarmSound(){
+  try{
+    let ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let osc = ctx.createOscillator();
+    let gain = ctx.createGain();
+    osc.frequency.value = 880;
+    gain.gain.value = 0.25;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(()=>osc.stop(),700);
+  }catch(e){}
+}
+
+function testAlarm(){
+  alarmSound();
+  notify("V-Rise Reminder","Wake up. Complete your goals. Rise now.");
+  alert("V-Rise Reminder: Complete your goals!");
+}
+
+setInterval(()=>{
+  if(!data.alarm) return;
+
+  let now = new Date();
+  let h = String(now.getHours()).padStart(2,"0");
+  let m = String(now.getMinutes()).padStart(2,"0");
+  let current = h + ":" + m;
+
+  let key = "alarm_" + new Date().toDateString() + "_" + current;
+
+  if(current === data.alarm && localStorage.getItem(key) !== "done"){
+    localStorage.setItem(key,"done");
+    testAlarm();
+  }
+},15000);
+
+function startTimer(){
+  if(timerRunning) return;
+  timerRunning = true;
+
+  timerInterval = setInterval(()=>{
+    timerSeconds--;
+    updateTimerUI();
+
+    if(timerSeconds <= 0){
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerSeconds = 25 * 60;
+      updateTimerUI();
+      alarmSound();
+      notify("V-Rise Focus Complete","25 minute focus session complete.");
+      alert("Focus session complete!");
+    }
+  },1000);
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 25 * 60;
+  updateTimerUI();
+}
+
+function updateTimerUI(){
+  let min = Math.floor(timerSeconds / 60);
+  let sec = timerSeconds % 60;
+  document.getElementById("timer").innerText =
+    String(min).padStart(2,"0") + ":" + String(sec).padStart(2,"0");
+}
+
+function exportData(){
+  let text = JSON.stringify(data,null,2);
+  let blob = new Blob([text],{type:"application/json"});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "v-rise-backup.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAll(){
+  let yes = confirm("Sab data delete karna hai?");
+  if(yes){
+    localStorage.removeItem("vriseData");
+    location.reload();
+  }
+}
+
+function scrollToTop(){
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function focusGoal(){
+  document.getElementById("taskInput").focus();
+}
+
+window.onload = function(){
+  setTimeout(()=>{
+    document.getElementById("splash").style.display = "none";
+  },1600);
+  render();
+  updateTimerUI();
+};
+</script>
+
+</body>
+</html>
